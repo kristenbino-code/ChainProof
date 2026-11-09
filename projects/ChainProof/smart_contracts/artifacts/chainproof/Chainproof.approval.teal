@@ -1,0 +1,238 @@
+#pragma version 11
+#pragma typetrack false
+
+// algopy.arc4.ARC4Contract.approval_program() -> uint64:
+main:
+    intcblock 0 2 1 32
+    bytecblock 0x686173685f 0x6f776e65725f 0x151f7c75
+    // smart_contracts/chainproof/contract.py:6
+    // class Chainproof(ARC4Contract):
+    txn NumAppArgs
+    bz main___algopy_default_create@13
+    txn OnCompletion
+    !
+    assert
+    txn ApplicationID
+    assert
+    pushbytess 0x60aca9b7 0xbc8a69c4 0x93a10e0e 0xc9a6d3dc // method "register_evidence(string,byte[])string", method "transfer_custody(string,address)string", method "verify_evidence(string,byte[])bool", method "get_custodian(string)address"
+    txna ApplicationArgs 0
+    match register_evidence transfer_custody verify_evidence get_custodian
+    err
+
+main___algopy_default_create@13:
+    txn OnCompletion
+    !
+    txn ApplicationID
+    !
+    &&
+    return
+
+
+// smart_contracts.chainproof.contract.Chainproof.register_evidence[routing]() -> void:
+register_evidence:
+    // smart_contracts/chainproof/contract.py:19
+    // @abimethod()
+    txna ApplicationArgs 1
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_1 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    txna ApplicationArgs 2
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_1 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    // smart_contracts/chainproof/contract.py:26
+    // assert evidence_id not in self.evidence_hashes, "Evidence already registered"
+    bytec_0 // 0x686173685f
+    dig 2
+    concat
+    dup
+    box_len
+    bury 1
+    !
+    assert // Evidence already registered
+    // smart_contracts/chainproof/contract.py:27
+    // assert evidence_hash.length == 32, "Invalid SHA-256 hash length"
+    dig 1
+    len
+    intc_3 // 32
+    ==
+    assert // Invalid SHA-256 hash length
+    // smart_contracts/chainproof/contract.py:29
+    // self.evidence_hashes[evidence_id] = evidence_hash
+    dup
+    box_del
+    pop
+    swap
+    box_put
+    // smart_contracts/chainproof/contract.py:30
+    // self.custodians[evidence_id] = Txn.sender
+    txn Sender
+    bytec_1 // 0x6f776e65725f
+    uncover 2
+    concat
+    swap
+    box_put
+    // smart_contracts/chainproof/contract.py:19
+    // @abimethod()
+    pushbytes 0x151f7c75002045766964656e63652072656769737465726564207375636365737366756c6c79
+    log
+    intc_2 // 1
+    return
+
+
+// smart_contracts.chainproof.contract.Chainproof.transfer_custody[routing]() -> void:
+transfer_custody:
+    // smart_contracts/chainproof/contract.py:34
+    // @abimethod()
+    txna ApplicationArgs 1
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_1 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    txna ApplicationArgs 2
+    dup
+    len
+    intc_3 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    // smart_contracts/chainproof/contract.py:41
+    // assert evidence_id in self.evidence_hashes, "Evidence not found"
+    bytec_0 // 0x686173685f
+    dig 2
+    concat
+    box_len
+    bury 1
+    assert // Evidence not found
+    // smart_contracts/chainproof/contract.py:42
+    // assert self.custodians[evidence_id] == Txn.sender, "Unauthorized transfer"
+    bytec_1 // 0x6f776e65725f
+    uncover 2
+    concat
+    dup
+    box_get
+    assert // check self.custodians entry exists
+    txn Sender
+    ==
+    assert // Unauthorized transfer
+    // smart_contracts/chainproof/contract.py:44
+    // self.custodians[evidence_id] = new_custodian
+    swap
+    box_put
+    // smart_contracts/chainproof/contract.py:34
+    // @abimethod()
+    pushbytes 0x151f7c750020437573746f6479207472616e73666572726564207375636365737366756c6c79
+    log
+    intc_2 // 1
+    return
+
+
+// smart_contracts.chainproof.contract.Chainproof.verify_evidence[routing]() -> void:
+verify_evidence:
+    // smart_contracts/chainproof/contract.py:48
+    // @abimethod()
+    txna ApplicationArgs 1
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_1 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    txna ApplicationArgs 2
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_1 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    // smart_contracts/chainproof/contract.py:55
+    // assert evidence_id in self.evidence_hashes, "Evidence not found"
+    bytec_0 // 0x686173685f
+    uncover 2
+    concat
+    dup
+    box_len
+    bury 1
+    assert // Evidence not found
+    // smart_contracts/chainproof/contract.py:57
+    // return self.evidence_hashes[evidence_id] == submitted_hash
+    box_get
+    pop
+    ==
+    // smart_contracts/chainproof/contract.py:48
+    // @abimethod()
+    pushbytes 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    bytec_2 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_2 // 1
+    return
+
+
+// smart_contracts.chainproof.contract.Chainproof.get_custodian[routing]() -> void:
+get_custodian:
+    // smart_contracts/chainproof/contract.py:59
+    // @abimethod()
+    txna ApplicationArgs 1
+    dup
+    intc_0 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_1 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    // smart_contracts/chainproof/contract.py:62
+    // assert evidence_id in self.custodians, "Evidence not found"
+    bytec_1 // 0x6f776e65725f
+    swap
+    concat
+    dup
+    box_len
+    bury 1
+    assert // Evidence not found
+    // smart_contracts/chainproof/contract.py:64
+    // return self.custodians[evidence_id]
+    box_get
+    pop
+    // smart_contracts/chainproof/contract.py:59
+    // @abimethod()
+    bytec_2 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_2 // 1
+    return
